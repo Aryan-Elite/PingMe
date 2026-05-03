@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Message = require('../models/Message');
+const Room = require('../models/Room');
 
 const setupChat=(io) => {
   const chatNS = io.of('/chat'); // /chat namespace — isolated channel for messaging
@@ -38,6 +39,21 @@ const setupChat=(io) => {
         senderId: socket.user.userId,
         content,
         createdAt: message.createdAt
+      });
+
+      // find the other participant in the room and notify them
+      const room = await Room.findById(roomId);
+      const recipientId = room.participants.find(
+        id => id.toString() !== socket.user.userId
+      );
+
+      // push notification to recipient's personal room in /notifications namespace
+      io.of('/notifications').to(recipientId.toString()).emit('notification', {
+        type: 'new_message',
+        from: socket.user.userId,
+        content,
+        roomId,
+        timestamp: Date.now()
       });
     });
 

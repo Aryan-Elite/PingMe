@@ -34,9 +34,10 @@ const login=async(req,res)=>{
   try{
    const {email,password}=req.body;
    const user= await User.findOne({email});
+   if(!user) return res.status(401).send('No account found with this email');
    const decodedPassword= await bcrypt.compare(password,user.password);
    if(!decodedPassword){
-      return res.status(401).send('User has entered wrong password');
+      return res.status(401).send('Wrong password');
    }
    else{
     const accessToken = jwt.sign(
@@ -92,4 +93,13 @@ const refresh=async(req,res)=>{
   }
 }
 
-module.exports={register,login,refresh};
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, '_id email userName');
+    res.json(users);
+  } catch (error) {
+    res.status(500).send('Error fetching users');
+  }
+};
+
+module.exports={register,login,refresh,getUsers};
