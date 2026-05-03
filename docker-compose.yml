@@ -1,0 +1,23 @@
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/pingme
+      - ACCESS_TOKEN_SECRET=mysecretkey123
+      - REFRESH_TOKEN_SECRET=myrefreshsecret123
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
