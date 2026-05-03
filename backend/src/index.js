@@ -25,7 +25,7 @@ setupChat(io);
 setupNotifications(io);
 
 // routes
-app.get('/', (req, res) => res.json('Health is good'));
+app.get('/', (req, res) => res.json('Health is good - CI/CD works!'));
 app.use('/auth', authRoute);
 app.use('/chat', chatRoute); // room creation + message history
 
